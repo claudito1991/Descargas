@@ -1,6 +1,7 @@
 import pandas as pd
 import PySimpleGUI as sg
 import os
+import xlsxwriter
 
 import functions 
 
@@ -19,7 +20,15 @@ def Proceso(fecha, archivo):
     df_final = functions.suma_y_merge(df_menos_columnas, articulos_unicos)
     return df_final,repartos
 
+def Export_excel(df_final):
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    writer = pd.ExcelWriter('descargas.xlsx', engine='xlsxwriter')
 
+    # Convert the dataframe to an XlsxWriter Excel object.
+    df_final.to_excel(writer, sheet_name='Sheet1')
+
+# Close the Pandas Excel writer and output the Excel file.
+    writer.save()
 
 right_col = [[ sg.Text('Fecha DES', size=(12,1))],
             [ sg.Input(key='-FECHA-', size=(12,1))], [sg.Exit()]]
@@ -41,5 +50,6 @@ while True:
             fecha = values['-FECHA-']
             df_final,repartos = Proceso(fecha,excel_file)
             print(df_final)
+            Export_excel(df_final)
             print(repartos)
 window.close()
