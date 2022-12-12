@@ -2,7 +2,6 @@ import pandas as pd
 import PySimpleGUI as sg
 import os
 import xlsxwriter
-
 import functions 
 
 working_directory = os.getcwd()
@@ -12,7 +11,8 @@ left_col = [
  [sg.Button("Procesar")],
  [sg.Text(key='-OUT-LOG-')]]
 
-
+def Reverse_string_from_user(string):
+    return string[-4:] + "-" + string[:2]+"-"+string[3:5]
 def Proceso(fecha, archivo):
     df_filtrado_por_fecha = functions.mask_dataframe_single_date(archivo, fecha)
     repartos = functions.cantidad_de_repartos(df_filtrado_por_fecha)
@@ -25,7 +25,7 @@ def Exportar_excel(dataframe):
     writer = pd.ExcelWriter('salida/descargas.xlsx', engine='xlsxwriter')
 
     # Convert the dataframe to an XlsxWriter Excel object.
-    dataframe.to_excel(writer, sheet_name='Sheet1')
+    dataframe.to_excel(writer, sheet_name='descargas consolidado')
 
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
@@ -47,7 +47,7 @@ while True:
             file_path = values["-FILE_PATH-"]
             excel_file = pd.read_excel(file_path)
             window['-OUT-LOG-'].update("Se cargó el archivo necesario")
-            fecha = values['-FECHA-']
+            fecha = Reverse_string_from_user(values['-FECHA-'])
             df_final,repartos = Proceso(fecha,excel_file)
             Exportar_excel(df_final)
             print(repartos)
