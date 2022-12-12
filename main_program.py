@@ -6,7 +6,7 @@ import functions
 
 working_directory = os.getcwd()
 left_col = [
- [sg.Text('Filename')],
+ [sg.Text('Ingresar archivo de descargas')],
  [sg.Input(key="-FILE_PATH-"), sg.FileBrowse(initial_folder=working_directory)], 
  [sg.Button("Procesar")],
  [sg.Text(key='-OUT-LOG-')]]
@@ -33,7 +33,7 @@ def Proceso(fecha, archivo):
 
 def Exportar_excel(dataframe):
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter('salida/descargas.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter('salida/descargas_{}.xlsx'.format(values['-FECHA-']), engine='xlsxwriter')
 
     # Convert the dataframe to an XlsxWriter Excel object.
     dataframe.to_excel(writer, sheet_name='descargas consolidado')
@@ -65,6 +65,31 @@ def CreateTable(dataframe):
             break
     window.close()
 
+def Create_table_repartos(fecha,dataframe):
+    df_filtrado = functions.mask_dataframe_single_date(dataframe,fecha)
+    df_repartos = functions.dataframe_repartos(df_filtrado)
+    df_repartos = df_repartos.reset_index()
+    print("longitud de tabla: ", len(df_repartos) )
+    longitud_tabla = len(df_repartos)
+    headers = list(df_repartos.columns.astype(str))
+    #headers=[StringFunction(x) for x in headers]
+    table_values = df_repartos.values.tolist()
+    table = [[sg.Table(values = table_values, headings=headers,
+                max_col_width=35,
+                auto_size_columns=True,
+                justification='center',
+                num_rows=longitud_tabla,
+                key='-TABLE-',
+                row_height=35)]]
+    layout = [[sg.Column(table, element_justification='left') ] ]
+  
+    window = sg.Window('Repartos procesados', layout,resizable=True)
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            break
+    window.close()
+
 
 
 
@@ -89,6 +114,7 @@ while True:
             fecha = Reverse_string_from_user(values['-FECHA-'])
             df_final,repartos = Proceso(fecha,excel_file)
             Exportar_excel(df_final)
+            Create_table_repartos(fecha,excel_file)
             print(repartos)
             CreateTable(df_final)
 window.close()

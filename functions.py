@@ -20,3 +20,7 @@ def suma_y_merge(df_datos,df_articulos):
     df_suma = df_datos.groupby('Artículo').sum()
     df_final = df_suma.merge(df_articulos, on='Artículo')
     return df_final[['Fecha Mvto','Artículo','Descripción Artículo','Bultos','Unids']]
+
+def dataframe_repartos(df):
+    repartos = df[['Número', 'Descripción Transporte']]
+    return repartos.drop_duplicates(subset='Número')
