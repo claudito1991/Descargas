@@ -11,6 +11,17 @@ left_col = [
  [sg.Button("Procesar")],
  [sg.Text(key='-OUT-LOG-')]]
 
+
+def Make_directory():
+    #python program to check if a directory exists
+    working_directory = os.getcwd()
+    # Check whether the specified path exists or not
+    isExist = os.path.exists(working_directory+"/salida")
+    if not isExist:
+        # Create a new directory because it does not exist
+        os.makedirs(working_directory+"/salida")
+        print("The new directory is created!")
+
 def Reverse_string_from_user(string):
     return string[-4:] + "-" + string[:2]+"-"+string[3:5]
 def Proceso(fecha, archivo):
@@ -71,6 +82,7 @@ while True:
         break
 
     elif event == "Procesar":
+            Make_directory()
             file_path = values["-FILE_PATH-"]
             excel_file = pd.read_excel(file_path)
             window['-OUT-LOG-'].update("Se cargó el archivo necesario")
