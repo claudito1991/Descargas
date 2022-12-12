@@ -30,6 +30,33 @@ def Exportar_excel(dataframe):
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
 
+def CreateTable(dataframe):
+    
+    dataframe = dataframe.reset_index()
+    print("longitud de tabla: ", len(dataframe) )
+    longitud_tabla = len(dataframe)
+    headers = list(dataframe.columns.astype(str))
+    #headers=[StringFunction(x) for x in headers]
+    table_values = dataframe.values.tolist()
+    table = [[sg.Table(values = table_values, headings=headers,
+                max_col_width=35,
+                auto_size_columns=True,
+                justification='center',
+                num_rows=longitud_tabla,
+                key='-TABLE-',
+                row_height=35)]]
+    layout = [[sg.Column(table, element_justification='left') ] ]
+  
+    window = sg.Window('Descargas consolidado', layout,resizable=True)
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            break
+    window.close()
+
+
+
+
 right_col = [[ sg.Text('Fecha DES', size=(12,1))],
             [ sg.Input(key='-FECHA-', size=(12,1))], [sg.Exit()]]
 
@@ -51,4 +78,5 @@ while True:
             df_final,repartos = Proceso(fecha,excel_file)
             Exportar_excel(df_final)
             print(repartos)
+            CreateTable(df_final)
 window.close()
